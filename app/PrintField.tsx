@@ -414,10 +414,7 @@ export function PrintField() {
   const initializeWorker = useCallback(() => {
     if (workerRef.current) return;
     setTrackingState("model-loading");
-    const worker = new Worker(
-      new URL("./hand-tracker.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    const worker = new Worker("/hand-tracker.worker.js", { type: "module" });
     workerRef.current = worker;
     worker.onmessage = (event: MessageEvent<WorkerOutbound>) => {
       if (event.data.type === "ready") {

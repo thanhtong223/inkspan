@@ -1,35 +1,20 @@
-/// <reference lib="webworker" />
-
 import {
   FilesetResolver,
   HandLandmarker,
-  type HandLandmarkerResult,
-} from "@mediapipe/tasks-vision";
-import {
-  FINGERTIP_INDICES,
-} from "./geometry";
-import type {
-  HandFrame,
-  TrackedHand,
-  WorkerInbound,
-  WorkerOutbound,
-} from "./types";
+} from "/mediapipe/vision_bundle.mjs";
 
+const FINGERTIP_INDICES = [4, 8, 12, 16, 20];
 const WASM_ROOT = `${self.location.origin}/mediapipe`;
 const MODEL_URL = `${self.location.origin}/mediapipe/hand_landmarker.task`;
 
-let landmarker: HandLandmarker | null = null;
+let landmarker = null;
 
-function send(message: WorkerOutbound) {
+function send(message) {
   self.postMessage(message);
 }
 
-function convertResult(
-  result: HandLandmarkerResult,
-  timestamp: number,
-  inferenceMs: number,
-): HandFrame {
-  const hands: TrackedHand[] = result.landmarks.map((landmarks, index) => {
+function convertResult(result, timestamp, inferenceMs) {
+  const hands = result.landmarks.map((landmarks, index) => {
     const category = result.handedness[index]?.[0];
     const label = category?.categoryName || `hand-${index}`;
     const score = category?.score ?? 0.5;
@@ -39,6 +24,7 @@ function convertResult(
       z: point.z,
       index: landmarkIndex,
     }));
+
     return {
       id: `${label.toLowerCase()}-${index}`,
       label,
@@ -56,10 +42,11 @@ function convertResult(
       }),
     };
   });
+
   return { hands, timestamp, inferenceMs };
 }
 
-self.onmessage = async (event: MessageEvent<WorkerInbound>) => {
+self.onmessage = async (event) => {
   try {
     if (event.data.type === "init") {
       const vision = await FilesetResolver.forVisionTasks(WASM_ROOT);
@@ -106,5 +93,3 @@ self.onmessage = async (event: MessageEvent<WorkerInbound>) => {
     });
   }
 };
-
-export {};
