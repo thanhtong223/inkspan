@@ -13,10 +13,10 @@ export default function PrivacyPage() {
       </p>
       <p>
         A recording exists only in browser memory until you save it or leave
-        the page. When you record, your browser asks you to share the current
-        INKSPAN tab so the saved video can include the visible controls.
-        The captured tab is still processed locally. Closing the page ends
-        camera and screen-capture access.
+        the page. INKSPAN records the processed camera canvas directly and
+        includes its recording controls and creator credit in the saved video.
+        It never asks to capture your screen or another tab. Closing the page
+        ends camera access and clears unsaved recordings.
       </p>
     </main>
   );

@@ -30,13 +30,14 @@ test("server-renders the INKSPAN camera shell", async () => {
   const html = await response.text();
   assert.match(html, /<title>INKSPAN<\/title>/i);
   assert.match(html, /INKSPAN/);
-  assert.match(html, /Start recording, choose this tab/);
+  assert.match(html, /Tap record, then raise both hands/);
   assert.match(html, /60 sec maximum/);
   assert.match(html, /local camera/);
   assert.match(html, /Recording timeline/);
   assert.match(html, /Enable camera/);
   assert.match(html, /Thanh Tong/);
   assert.match(html, /tvthanhhh/);
+  assert.doesNotMatch(html, /choose this tab|screen recording/i);
   assert.doesNotMatch(html, /Touch mode|Use touch points/);
   assert.doesNotMatch(html, /class="fingerpoint/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
