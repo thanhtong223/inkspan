@@ -45,163 +45,36 @@ const STATUS_COPY: Record<TrackingState, string> = {
 const RECORDING_LIMIT_MS = 60_000;
 const RECORDING_FPS = 30;
 
-function fillRoundedRect(
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-) {
-  const safeRadius = Math.min(radius, width / 2, height / 2);
-  context.beginPath();
-  context.moveTo(x + safeRadius, y);
-  context.arcTo(x + width, y, x + width, y + height, safeRadius);
-  context.arcTo(x + width, y + height, x, y + height, safeRadius);
-  context.arcTo(x, y + height, x, y, safeRadius);
-  context.arcTo(x, y, x + width, y, safeRadius);
-  context.closePath();
-  context.fill();
-}
-
-function drawRecordingChrome(
+function drawRecordingMarks(
   context: CanvasRenderingContext2D,
   width: number,
   height: number,
-  stageHeight: number,
-  elapsed: number,
-  trackingState: TrackingState,
 ) {
   const scale = width / 1280;
   const pad = Math.max(18, 28 * scale);
-  const deckTop = stageHeight;
-  const deckHeight = height - deckTop;
-  const compact = width < height || width < 760;
   const paper = "#f2eee3";
-  const muted = "#aaa79f";
-  const ink = "#292a27";
-  const line = "#555650";
-  const red = "#c93c37";
-  const green = "#8ecf52";
 
   context.save();
   context.textBaseline = "middle";
+  context.shadowColor = "rgba(20, 20, 18, 0.42)";
+  context.shadowBlur = Math.max(5, 10 * scale);
   context.font = `600 ${Math.max(11, 14 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
   context.fillStyle = paper;
   context.fillText("INKSPAN", pad, Math.max(24, 32 * scale));
-
-  const localLabel = "local camera";
-  context.font = `400 ${Math.max(10, 12 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
-  const localWidth = context.measureText(localLabel).width;
-  context.fillStyle = green;
-  context.beginPath();
-  context.arc(
-    width - pad - localWidth - 12 * scale,
-    Math.max(24, 32 * scale),
-    Math.max(3, 4 * scale),
-    0,
-    Math.PI * 2,
-  );
-  context.fill();
-  context.fillStyle = paper;
-  context.fillText(
-    localLabel,
-    width - pad - localWidth,
-    Math.max(24, 32 * scale),
-  );
-
-  context.fillStyle = ink;
-  context.fillRect(0, deckTop, width, deckHeight);
-  context.fillStyle = line;
-  context.fillRect(0, deckTop, width, Math.max(1, scale));
-
-  const mainY = deckTop + Math.min(deckHeight * 0.34, 44 * scale);
-  const footerY = deckTop + deckHeight - Math.max(13, 18 * scale);
-  const buttonWidth = compact ? 92 * scale : 112 * scale;
-  const buttonHeight = Math.min(deckHeight * 0.42, 42 * scale);
-  const buttonX = compact ? pad : width * 0.38;
-  const buttonY = mainY - buttonHeight / 2;
-
-  context.fillStyle = red;
-  fillRoundedRect(
-    context,
-    buttonX,
-    buttonY,
-    buttonWidth,
-    buttonHeight,
-    buttonHeight / 2,
-  );
-  context.fillStyle = paper;
-  context.font = `650 ${Math.max(10, 12 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
-  fillRoundedRect(
-    context,
-    buttonX + 14 * scale,
-    mainY - 4 * scale,
-    8 * scale,
-    8 * scale,
-    1.5 * scale,
-  );
-  context.fillText("REC", buttonX + 30 * scale, mainY);
-
-  const timelineX = buttonX + buttonWidth + 18 * scale;
-  const timelineRight = width - pad;
-  const timelineWidth = Math.max(52 * scale, timelineRight - timelineX);
-  context.fillStyle = muted;
-  context.font = `500 ${Math.max(9, 11 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
-  context.fillText(
-    formatDuration(elapsed),
-    timelineRight - context.measureText(formatDuration(elapsed)).width,
-    mainY - 9 * scale,
-  );
-  context.fillStyle = line;
-  context.fillRect(timelineX, mainY + 8 * scale, timelineWidth, 3 * scale);
-  context.fillStyle = red;
-  context.fillRect(
-    timelineX,
-    mainY + 8 * scale,
-    timelineWidth * Math.min(1, elapsed / RECORDING_LIMIT_MS),
-    3 * scale,
-  );
-
-  if (!compact) {
-    context.fillStyle = trackingState === "locked" ? green : muted;
-    context.beginPath();
-    context.arc(pad, mainY, 4 * scale, 0, Math.PI * 2);
-    context.fill();
-    context.fillStyle = paper;
-    context.font = `600 ${Math.max(10, 11 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
-    context.fillText(STATUS_COPY[trackingState], pad + 12 * scale, mainY);
-  }
-
-  context.fillStyle = muted;
-  context.font = `400 ${Math.max(8, 10 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
-  context.fillText("Created by", pad, footerY);
-  const createdWidth = context.measureText("Created by").width;
-  context.fillStyle = paper;
-  context.font = `600 ${Math.max(8, 10 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
-  context.fillText("Thanh Tong", pad + createdWidth + 7 * scale, footerY);
-  const nameWidth = context.measureText("Thanh Tong").width;
-  context.fillStyle = muted;
-  context.font = `400 ${Math.max(8, 10 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
-  context.fillText(
-    "@tvthanhhh",
-    pad + createdWidth + nameWidth + 14 * scale,
-    footerY,
-  );
+  context.font = `500 ${Math.max(10, 12 * scale)}px "Helvetica Neue", "Segoe UI", Arial, sans-serif`;
+  const credit = "@tvthanhhh";
+  const creditWidth = context.measureText(credit).width;
+  context.fillText(credit, width - pad - creditWidth, height - pad);
   context.restore();
 }
 
-function timestampName() {
+function recordingName(extension: string) {
   const stamp = new Date()
     .toISOString()
     .replace(/[-:]/g, "")
     .replace("T", "-")
     .slice(0, 15);
-  return `inkspan-${stamp}.jpg`;
-}
-
-function recordingName(extension: string) {
-  return timestampName().replace(".jpg", `.${extension}`);
+  return `inkspan-${stamp}.${extension}`;
 }
 
 function formatDuration(milliseconds: number) {
@@ -270,14 +143,12 @@ export function PrintField() {
   const zoneVelocityRef = useRef<ZoneGeometry[]>([]);
   const lastZoneUpdateRef = useRef(0);
   const opacityRef = useRef(0);
-  const snapshotUrlRef = useRef<string | null>(null);
   const recordingUrlRef = useRef<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingChunksRef = useRef<Blob[]>([]);
   const recordingStartedRef = useRef(0);
   const recordingFrameRef = useRef(0);
   const recordingStreamRef = useRef<MediaStream | null>(null);
-  const trackingStateRef = useRef<TrackingState>("permission");
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(
     null,
   );
@@ -287,8 +158,6 @@ export function PrintField() {
   const [trackingState, setTrackingState] =
     useState<TrackingState>("permission");
   const [cameraLive, setCameraLive] = useState(false);
-  const [snapshot, setSnapshot] = useState<string | null>(null);
-  const [flash, setFlash] = useState(false);
   const [lockNotice, setLockNotice] = useState(false);
   const [recording, setRecording] = useState(false);
   const [recordingElapsed, setRecordingElapsed] = useState(0);
@@ -298,10 +167,6 @@ export function PrintField() {
   const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
-
-  useEffect(() => {
-    trackingStateRef.current = trackingState;
-  }, [trackingState]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -641,67 +506,11 @@ export function PrintField() {
       }
       cancelAnimationFrame(recordingFrameRef.current);
       recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
-      if (snapshotUrlRef.current) {
-        URL.revokeObjectURL(snapshotUrlRef.current);
-      }
       if (recordingUrlRef.current) {
         URL.revokeObjectURL(recordingUrlRef.current);
       }
     };
   }, []);
-
-  const capture = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !cameraLive) return;
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-        if (snapshotUrlRef.current) {
-          URL.revokeObjectURL(snapshotUrlRef.current);
-        }
-        const url = URL.createObjectURL(blob);
-        snapshotUrlRef.current = url;
-        setSnapshot(url);
-        setFlash(true);
-        setTimeout(() => setFlash(false), 170);
-      },
-      "image/jpeg",
-      0.92,
-    );
-  }, [cameraLive]);
-
-  const closeSnapshot = useCallback(() => {
-    if (snapshotUrlRef.current) {
-      URL.revokeObjectURL(snapshotUrlRef.current);
-      snapshotUrlRef.current = null;
-    }
-    setSnapshot(null);
-  }, []);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.code === "Space" &&
-        !event.repeat &&
-        cameraLive &&
-        !snapshot
-      ) {
-        event.preventDefault();
-        capture();
-      }
-      if (event.key === "Escape" && snapshot) closeSnapshot();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cameraLive, capture, closeSnapshot, snapshot]);
-
-  const download = () => {
-    if (!snapshot) return;
-    const link = document.createElement("a");
-    link.href = snapshot;
-    link.download = timestampName();
-    link.click();
-  };
 
   const stopRecording = useCallback(() => {
     if (recordingTimerRef.current) {
@@ -728,8 +537,7 @@ export function PrintField() {
 
     const sourceCanvas = canvasRef.current;
     const stage = stageRef.current;
-    const root = stage?.parentElement;
-    if (!sourceCanvas || !stage || !root) {
+    if (!sourceCanvas || !stage) {
       setRecordingError("The camera is not ready to record yet.");
       return;
     }
@@ -747,41 +555,27 @@ export function PrintField() {
       "video/mp4",
     ].find((candidate) => MediaRecorder.isTypeSupported(candidate));
     const compositor = document.createElement("canvas");
-    const longestSide = Math.max(root.clientWidth, root.clientHeight);
+    const longestSide = Math.max(stage.clientWidth, stage.clientHeight);
     const outputScale = Math.min(1, 1440 / Math.max(1, longestSide));
-    compositor.width = Math.max(1, Math.round(root.clientWidth * outputScale));
-    compositor.height = Math.max(1, Math.round(root.clientHeight * outputScale));
+    compositor.width = Math.max(1, Math.round(stage.clientWidth * outputScale));
+    compositor.height = Math.max(1, Math.round(stage.clientHeight * outputScale));
     const context = compositor.getContext("2d", { alpha: false });
     if (!context) {
       setRecordingError("This browser could not prepare video recording.");
       return;
     }
-    const recordedStageHeight = Math.round(
-      stage.clientHeight * outputScale,
-    );
     const stream = compositor.captureStream(RECORDING_FPS);
     recordingStreamRef.current = stream;
 
     const drawFrame = () => {
-      const elapsed = Math.min(
-        RECORDING_LIMIT_MS,
-        performance.now() - recordingStartedRef.current,
-      );
       context.drawImage(
         sourceCanvas,
         0,
         0,
         compositor.width,
-        recordedStageHeight,
-      );
-      drawRecordingChrome(
-        context,
-        compositor.width,
         compositor.height,
-        recordedStageHeight,
-        elapsed,
-        trackingStateRef.current,
       );
+      drawRecordingMarks(context, compositor.width, compositor.height);
       recordingFrameRef.current = requestAnimationFrame(drawFrame);
     };
     let recorder: MediaRecorder;
@@ -890,7 +684,6 @@ export function PrintField() {
         </div>
       )}
 
-      {flash && <div className="flash" aria-hidden="true" />}
       </section>
 
       <section className="control-deck" aria-label="Camera controls">
@@ -938,8 +731,8 @@ export function PrintField() {
           </div>
         </div>
 
-        <div className="deck-actions">
-          {recordingUrl && !recording && (
+        {recordingUrl && !recording && (
+          <div className="deck-actions">
             <button
               className="save-recording"
               type="button"
@@ -947,20 +740,11 @@ export function PrintField() {
             >
               Save video
             </button>
-          )}
-          <button
-            className="photo-control"
-            type="button"
-            onClick={capture}
-            disabled={!cameraLive || recording}
-          >
-            Photo
-          </button>
-        </div>
+          </div>
+        )}
 
         <footer className="deck-footer">
           <p className="creator-credit">
-            Created by <strong>Thanh Tong</strong>
             <a
               href="https://www.instagram.com/tvthanhhh/"
               target="_blank"
@@ -976,32 +760,6 @@ export function PrintField() {
           </nav>
         </footer>
       </section>
-
-      {snapshot && (
-        <section
-          className="capture-view"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="capture-title"
-        >
-          <div className="capture-header">
-            <p id="capture-title">INKSPAN / CAPTURE</p>
-            <button type="button" onClick={closeSnapshot}>
-              close
-            </button>
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={snapshot} alt="Your INKSPAN capture" />
-          <div className="capture-actions">
-            <button type="button" onClick={closeSnapshot}>
-              Retake
-            </button>
-            <button type="button" onClick={download}>
-              Download photo
-            </button>
-          </div>
-        </section>
-      )}
     </main>
   );
 }

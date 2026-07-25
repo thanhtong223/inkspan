@@ -35,8 +35,9 @@ test("server-renders the INKSPAN camera shell", async () => {
   assert.match(html, /local camera/);
   assert.match(html, /Recording timeline/);
   assert.match(html, /Enable camera/);
-  assert.match(html, /Thanh Tong/);
   assert.match(html, /tvthanhhh/);
+  assert.doesNotMatch(html, />Photo</i);
+  assert.doesNotMatch(html, /Download photo|Retake|INKSPAN \/ CAPTURE/i);
   assert.doesNotMatch(html, /choose this tab|screen recording/i);
   assert.doesNotMatch(html, /Touch mode|Use touch points/);
   assert.doesNotMatch(html, /class="fingerpoint/);

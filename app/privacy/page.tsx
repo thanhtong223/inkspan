@@ -8,15 +8,15 @@ export default function PrivacyPage() {
       <h1>Your camera stays with you.</h1>
       <p>
         INKSPAN processes camera frames and hand landmarks locally in
-        your browser. Camera frames, recordings, and photos are not uploaded
-        to a server by this prototype.
+        your browser. Camera frames and recordings are not uploaded to a
+        server by this prototype.
       </p>
       <p>
         A recording exists only in browser memory until you save it or leave
         the page. INKSPAN records the processed camera canvas directly and
-        includes its recording controls and creator credit in the saved video.
-        It never asks to capture your screen or another tab. Closing the page
-        ends camera access and clears unsaved recordings.
+        includes only the INKSPAN mark and @tvthanhhh credit in the saved
+        video. It never asks to capture your screen or another tab. Closing
+        the page ends camera access and clears unsaved recordings.
       </p>
     </main>
   );
