@@ -755,6 +755,12 @@ export function PrintField() {
           </p>
           <nav aria-label="Legal">
             <span>processed locally</span>
+            <a
+              className="effect-link"
+              href="https://convexcam.thanh-tong.com"
+            >
+              Convex Mirror ↗
+            </a>
             <a href="/privacy">Privacy</a>
             <a href="/terms">Terms</a>
           </nav>

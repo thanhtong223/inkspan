@@ -918,6 +918,22 @@ body {
   text-underline-offset: 3px;
 }
 
+.deck-footer .effect-link {
+  border: 1px solid oklch(0.47 0.01 93);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--paper);
+  text-decoration: none;
+  transition:
+    border-color 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+}
+
+.deck-footer .effect-link:hover {
+  border-color: var(--paper);
+  background: oklch(0.25 0.008 102);
+}
+
 .deck-footer span {
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -994,6 +1010,10 @@ body {
 
   .deck-footer nav span {
     display: none;
+  }
+
+  .deck-footer nav {
+    gap: 9px;
   }
 }
 
