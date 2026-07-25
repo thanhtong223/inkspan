@@ -18,6 +18,14 @@ export default function PrivacyPage() {
         video. It never asks to capture your screen or another tab. Closing
         the page ends camera access and clears unsaved recordings.
       </p>
+      <p>
+        INKSPAN uses Google Analytics 4 to measure page visits and anonymous
+        product actions such as enabling the camera, starting or saving a
+        recording, and switching camera effects. Google Analytics may use
+        cookies and receive standard device, browser, referral, and approximate
+        location information. Camera frames, hand landmarks, and recordings
+        are never included in analytics events.
+      </p>
     </main>
   );
 }

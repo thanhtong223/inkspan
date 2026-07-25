@@ -30,6 +30,7 @@ import type {
   HandLandmarker,
   HandLandmarkerResult,
 } from "@mediapipe/tasks-vision";
+import { trackEvent } from "./analytics";
 
 const STATUS_COPY: Record<TrackingState, string> = {
   permission: "Camera ready when you are",
@@ -477,6 +478,7 @@ export function PrintField() {
       video.srcObject = stream;
       await video.play();
       setCameraLive(true);
+      trackEvent("camera_enabled");
       if (!beginRendering()) {
         setTrackingState("unsupported");
         return;
@@ -606,6 +608,11 @@ export function PrintField() {
       setRecordingExtension(extension);
       setRecordingUrl(url);
       setRecording(false);
+      trackEvent("recording_completed", {
+        duration_seconds: Math.round(
+          (performance.now() - recordingStartedRef.current) / 1000,
+        ),
+      });
     };
     stream.getVideoTracks()[0]?.addEventListener("ended", () => {
       if (recordingTimerRef.current) {
@@ -621,6 +628,7 @@ export function PrintField() {
     setRecording(true);
     drawFrame();
     recorder.start(250);
+    trackEvent("recording_started");
     recordingTimerRef.current = setInterval(() => {
       const elapsed = Math.min(
         RECORDING_LIMIT_MS,
@@ -645,6 +653,9 @@ export function PrintField() {
     link.href = recordingUrl;
     link.download = recordingName(recordingExtension);
     link.click();
+    trackEvent("recording_downloaded", {
+      format: recordingExtension,
+    });
   };
 
   return (
@@ -758,6 +769,9 @@ export function PrintField() {
             <a
               className="effect-link"
               href="https://convexcam.thanh-tong.com"
+              onClick={() =>
+                trackEvent("effect_switched", { destination: "convex" })
+              }
             >
               Convex Mirror ↗
             </a>
